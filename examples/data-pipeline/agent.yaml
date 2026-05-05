@@ -1,0 +1,50 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: fhir-pipeline-agent
+  version: 0.2.0
+  description: Operates a FHIR bulk data pipeline and answers questions about its state.
+  authors: [Agentfile Contributors]
+  license: MIT
+  tags: [healthcare, fhir, data-pipeline]
+spec:
+  model:
+    provider: anthropic
+    name: claude-sonnet-4-5
+    params:
+      temperature: 0.2
+      max_tokens: 8192
+  system_prompt:
+    file: ./prompts/system.md
+  tools:
+    - mcp: https://internal-fhir-mcp.example.com/mcp
+      auth:
+        type: bearer
+        env: FHIR_MCP_TOKEN
+    - mcp: https://oci-streaming-mcp.example.com/mcp
+      auth:
+        type: bearer
+        env: OCI_MCP_TOKEN
+    - mcp: builtin/filesystem
+  memory:
+    type: chroma
+    config:
+      collection: fhir-pipeline-runs
+      embedding_model: all-MiniLM-L6-v2
+  permissions:
+    network:
+      mode: allowlist
+      hosts:
+        - api.anthropic.com
+        - internal-fhir-mcp.example.com
+        - oci-streaming-mcp.example.com
+    filesystem:
+      mode: read-only
+      paths: [./prompts, ./schemas]
+  env:
+    required:
+      - ANTHROPIC_API_KEY
+      - FHIR_MCP_TOKEN
+      - OCI_MCP_TOKEN
+    optional:
+      - LOG_LEVEL

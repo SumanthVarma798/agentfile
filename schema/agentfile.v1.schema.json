@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentfile.dev/schema/v1.json",
+  "title": "Agentfile v1",
+  "description": "Declarative manifest for an AI agent.",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "additionalProperties": false,
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "agentfile/v1"
+    },
+    "kind": {
+      "type": "string",
+      "const": "Agent"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*[a-z0-9]$",
+          "description": "Kebab-case identifier for the agent."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+          "description": "SemVer 2.0.0 string."
+        },
+        "description": { "type": "string" },
+        "authors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "license": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["model", "system_prompt"],
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "object",
+          "required": ["provider", "name"],
+          "additionalProperties": false,
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["anthropic", "openai", "google", "bedrock", "azure", "local", "custom"]
+            },
+            "name": { "type": "string", "minLength": 1 },
+            "endpoint": {
+              "type": "string",
+              "format": "uri",
+              "description": "Required when provider is 'custom'."
+            },
+            "params": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "system_prompt": {
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            {
+              "type": "object",
+              "required": ["file"],
+              "additionalProperties": false,
+              "properties": {
+                "file": { "type": "string", "minLength": 1 }
+              }
+            }
+          ]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["mcp"],
+            "additionalProperties": false,
+            "properties": {
+              "mcp": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Either a URL or a 'builtin/<name>' shorthand."
+              },
+              "auth": {
+                "type": "object",
+                "required": ["type"],
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["bearer", "oauth", "none"]
+                  },
+                  "env": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "memory": {
+          "type": "object",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["none", "chroma", "pinecone", "weaviate", "sqlite", "redis", "custom"]
+            },
+            "config": {
+              "oneOf": [
+                { "type": "object", "additionalProperties": true },
+                {
+                  "type": "object",
+                  "required": ["file"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "file": { "type": "string", "minLength": 1 }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "permissions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "network": {
+              "type": "object",
+              "required": ["mode"],
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": ["allowlist", "denylist", "open"]
+                },
+                "hosts": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "filesystem": {
+              "type": "object",
+              "required": ["mode"],
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": ["read-only", "read-write", "none"]
+                },
+                "paths": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "required": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "optional": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

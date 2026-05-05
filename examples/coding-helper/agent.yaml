@@ -1,0 +1,23 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: coding-helper
+  version: 0.1.0
+  description: A minimal coding assistant. Demonstrates the smallest valid Agentfile.
+  license: MIT
+  tags: [coding, minimal-example]
+spec:
+  model:
+    provider: anthropic
+    name: claude-sonnet-4-5
+  system_prompt: |
+    You are a precise coding assistant.
+
+    - Write idiomatic, well-typed code.
+    - Explain non-obvious decisions briefly.
+    - When asked to debug, reproduce the issue mentally before proposing a fix.
+    - Never invent APIs; if uncertain, say so.
+  tools:
+    - mcp: builtin/filesystem
+  env:
+    required: [ANTHROPIC_API_KEY]

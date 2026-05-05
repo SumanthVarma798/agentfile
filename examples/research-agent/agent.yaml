@@ -1,0 +1,32 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: research-agent
+  version: 0.1.0
+  description: A web-research agent that synthesizes findings into briefs.
+  authors: [Agentfile Contributors]
+  license: MIT
+  tags: [research, web, synthesis]
+spec:
+  model:
+    provider: anthropic
+    name: claude-sonnet-4-5
+    params:
+      temperature: 0.4
+      max_tokens: 4096
+  system_prompt:
+    file: ./prompts/system.md
+  tools:
+    - mcp: builtin/web_search
+    - mcp: builtin/web_fetch
+  permissions:
+    network:
+      mode: allowlist
+      hosts:
+        - api.anthropic.com
+    filesystem:
+      mode: read-only
+      paths: [./prompts]
+  env:
+    required: [ANTHROPIC_API_KEY]
+    optional: [OTEL_EXPORTER_OTLP_ENDPOINT]

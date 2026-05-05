@@ -1,0 +1,45 @@
+name: Spec Proposal
+description: Propose a change or addition to the Agentfile spec.
+labels: ["spec", "rfc"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before opening this issue**, please open a [Discussion](https://github.com/YOUR-USERNAME/agentfile/discussions) titled `RFC: <change>` first.
+        Spec changes need at least 7 days of community input before becoming an issue or PR.
+  - type: input
+    id: discussion
+    attributes:
+      label: Discussion link
+      description: Link to the RFC discussion.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      description: Concrete spec change. YAML examples welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: true
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: Backwards compatibility
+      options:
+        - Backwards-compatible (additive)
+        - Breaking (requires v2)
+    validations:
+      required: true

@@ -1,0 +1,40 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: test-full
+  version: 1.2.3-beta+build.42
+  description: Exercises every optional field.
+  authors: [Alice, Bob]
+  license: Apache-2.0
+  tags: [test, full]
+  homepage: https://example.com
+spec:
+  model:
+    provider: anthropic
+    name: claude-sonnet-4-5
+    params:
+      temperature: 0.5
+      max_tokens: 2048
+  system_prompt: "Inline prompt."
+  tools:
+    - mcp: builtin/web_search
+    - mcp: https://example.com/mcp
+      auth:
+        type: bearer
+        env: EXAMPLE_TOKEN
+  memory:
+    type: chroma
+    config:
+      collection: test
+  permissions:
+    network:
+      mode: allowlist
+      hosts: [api.anthropic.com]
+    filesystem:
+      mode: read-only
+      paths: [./data]
+  env:
+    required: [ANTHROPIC_API_KEY]
+    optional: [DEBUG]
+  params:
+    custom_runtime_flag: true

@@ -1,0 +1,10 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: test-minimal
+  version: 0.1.0
+spec:
+  model:
+    provider: anthropic
+    name: claude-sonnet-4-5
+  system_prompt: "You are a test agent."

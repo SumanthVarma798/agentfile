@@ -1,0 +1,6 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: missing-spec
+  version: 0.1.0
+# spec is missing entirely

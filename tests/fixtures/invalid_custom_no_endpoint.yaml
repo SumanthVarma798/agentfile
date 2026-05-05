@@ -1,0 +1,11 @@
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: custom-no-endpoint
+  version: 0.1.0
+spec:
+  model:
+    provider: custom
+    name: my-local-model
+    # missing 'endpoint'
+  system_prompt: "test"
