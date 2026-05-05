@@ -10,7 +10,7 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
 authors = [
-    { name = "Agentfile Contributors" }
+    { name = "Sumanth Varma" }
 ]
 keywords = ["ai", "agents", "llm", "mcp", "anthropic", "claude"]
 classifiers = [
@@ -41,9 +41,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/YOUR-USERNAME/agentfile"
-Documentation = "https://github.com/YOUR-USERNAME/agentfile/blob/main/SPEC.md"
-Issues = "https://github.com/YOUR-USERNAME/agentfile/issues"
+Homepage = "https://github.com/SumanthVarma798/agentfile"
+Documentation = "https://github.com/SumanthVarma798/agentfile/blob/main/SPEC.md"
+Issues = "https://github.com/SumanthVarma798/agentfile/issues"
 
 [project.scripts]
 agent = "agentfile.cli:main"

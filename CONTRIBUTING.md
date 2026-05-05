@@ -6,16 +6,16 @@ Thanks for your interest. This project is small and early — your involvement m
 
 | If you want to... | Do this |
 |---|---|
-| Report a bug | Open an [issue](https://github.com/YOUR-USERNAME/agentfile/issues) with a minimal repro |
+| Report a bug | Open an [issue](https://github.com/SumanthVarma798/agentfile/issues) with a minimal repro |
 | Suggest a small code change | Open a PR — keep it focused, include tests |
-| Propose a spec change | Open a [Discussion](https://github.com/YOUR-USERNAME/agentfile/discussions) first (see RFC process below) |
+| Propose a spec change | Open a [Discussion](https://github.com/SumanthVarma798/agentfile/discussions) first (see RFC process below) |
 | Add an example | PR welcome — examples live in `examples/` and must validate in CI |
 | Fix typos / docs | PR welcome, no need to ask |
 
 ## Development setup
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/agentfile.git
+git clone https://github.com/SumanthVarma798/agentfile.git
 cd agentfile
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"

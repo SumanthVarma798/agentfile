@@ -210,4 +210,4 @@ my-agent/
 - Signing: how do we prove provenance of an Agentfile?
 - Composition: how do agents reference other agents as sub-agents?
 
-These are deferred to future revisions. Discussion happens in the [RFC tracker](https://github.com/YOUR-USERNAME/agentfile/discussions).
+These are deferred to future revisions. Discussion happens in the [RFC tracker](https://github.com/SumanthVarma798/agentfile/discussions).

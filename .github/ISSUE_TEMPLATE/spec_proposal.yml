@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Before opening this issue**, please open a [Discussion](https://github.com/YOUR-USERNAME/agentfile/discussions) titled `RFC: <change>` first.
+        **Before opening this issue**, please open a [Discussion](https://github.com/SumanthVarma798/agentfile/discussions) titled `RFC: <change>` first.
         Spec changes need at least 7 days of community input before becoming an issue or PR.
   - type: input
     id: discussion

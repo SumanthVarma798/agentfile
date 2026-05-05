@@ -4,7 +4,7 @@ metadata:
   name: research-agent
   version: 0.1.0
   description: A web-research agent that synthesizes findings into briefs.
-  authors: [Agentfile Contributors]
+  authors: [Sumanth Varma]
   license: MIT
   tags: [research, web, synthesis]
 spec:

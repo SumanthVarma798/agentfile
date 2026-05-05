@@ -4,7 +4,7 @@ metadata:
   name: fhir-pipeline-agent
   version: 0.2.0
   description: Operates a FHIR bulk data pipeline and answers questions about its state.
-  authors: [Agentfile Contributors]
+  authors: [Sumanth Varma]
   license: MIT
   tags: [healthcare, fhir, data-pipeline]
 spec:

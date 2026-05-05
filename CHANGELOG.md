@@ -17,5 +17,5 @@ All notable changes to this project are documented here. Format follows [Keep a 
 - Three example Agentfiles: research-agent, data-pipeline, coding-helper.
 - CI pipeline: lint, type-check, tests on Python 3.10, 3.11, 3.12.
 
-[Unreleased]: https://github.com/YOUR-USERNAME/agentfile/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/YOUR-USERNAME/agentfile/releases/tag/v0.1.0
+[Unreleased]: https://github.com/SumanthVarma798/agentfile/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/SumanthVarma798/agentfile/releases/tag/v0.1.0
