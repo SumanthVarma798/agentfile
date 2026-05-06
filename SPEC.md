@@ -204,6 +204,36 @@ my-agent/
 └── README.md
 ```
 
+## 14. Consumers
+
+An Agentfile can be consumed in two complementary modes:
+
+### 14.1 Library / CLI
+
+The reference Python package (`agentfile`) exposes `validate()`, `validate_file()`, and `load_agentfile()` as a public API. The `agent` CLI wraps these for interactive use and CI pipelines:
+
+```bash
+agent validate ./agent.yaml    # exit 0 if valid, 1 if not
+agent show ./agent.yaml        # human-readable summary
+agent schema                   # dump JSON Schema
+```
+
+This mode is appropriate for CI/CD pipelines, Git hooks, and any workflow where an agent framework is not in the loop.
+
+### 14.2 MCP server (first-class runtime)
+
+The `agentfile-mcp` package wraps the same library functions as an MCP server, making Agentfile tools available natively inside any MCP-capable agent environment (Claude Code, Claude Desktop, Cursor, Continue, Cline, etc.).
+
+The server exposes:
+- **Tools:** `validate_agentfile`, `show_agentfile`, `get_agentfile_schema`, `list_examples`, `read_example`, `scaffold`, `lint_inline`
+- **Resources:** `agentfile://spec`, `agentfile://schema`, `agentfile://examples/{name}`
+
+MCP servers are first-class consumers of the spec. The validation logic is shared: `agentfile-mcp` calls `validate()` / `validate_file()` directly and never duplicates validation rules. Any future change to the validation spec is automatically reflected in both modes.
+
+Connect via: `uvx agentfile-mcp` (stdio transport).
+
+---
+
 ## 13. Open questions (v1.x roadmap)
 
 - Bundling: how is a multi-file Agentfile packaged for transport? (`agent pack` will define this in v0.4)
