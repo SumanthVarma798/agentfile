@@ -18,7 +18,17 @@
 
 ---
 
-## The pitch
+## Try it in 10 seconds
+
+Connect the MCP server (see [Use it with your agent](#use-it-with-your-agent)), then paste this into Claude Code, Claude Desktop, or Cursor:
+
+> **"Scaffold an Agentfile for a research agent that uses web search and writes Markdown briefs. Save it to ./agent.yaml and validate it."**
+
+Your agent will call `scaffold()`, write the file, and call `validate_agentfile()` to confirm it passes — all without touching a terminal.
+
+---
+
+## What is this?
 
 Sharing an agent today: *"clone this, copy these env vars, edit the hardcoded prompt on line 47, install our internal MCP server, hope it works."*
 
@@ -50,68 +60,88 @@ spec:
 
 One file. Diffable. Reviewable. Secret-free. Runs anywhere a compliant runtime exists.
 
-## Quickstart
+---
+
+## Use it with your agent
+
+Agentfile ships an MCP server that exposes authoring and validation tools natively. This is the primary way to use it.
+
+### Claude Code / Claude Desktop
+
+```bash
+# Install the MCP server and register it (one command):
+claude mcp add agentfile -- uvx agentfile-mcp
+# or with pipx:
+claude mcp add agentfile -- pipx run agentfile-mcp
+```
+
+After connecting, Claude sees these tools: `scaffold`, `validate_agentfile`, `lint_inline`, `show_agentfile`, `read_example`, `list_examples`, `get_agentfile_schema`.
+
+### Cursor / Continue / Cline
+
+Add to your MCP client config (e.g. `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "agentfile": {
+      "command": "uvx",
+      "args": ["agentfile-mcp"]
+    }
+  }
+}
+```
+
+### Bring your own MCP client
+
+`agentfile-mcp` speaks stdio MCP (Model Context Protocol). Any client that supports MCP stdio transport can connect to it. The server exposes 7 tools and 3 resources over the `agentfile://` URI scheme. See [SPEC.md §14](./SPEC.md#14-consumers) for the full consumer protocol.
+
+---
+
+## What to say to your agent
+
+Once the MCP server is connected, you can talk to your agent naturally:
+
+- **"Author an Agentfile for an agent that monitors our Postgres database and answers questions about query performance."**
+- **"Validate ./agent.yaml and explain any failures in plain English."**
+- **"What does the `data-pipeline` example demonstrate? Walk me through it."**
+- **"Convert this LangChain config into an Agentfile — here's the code: ..."**
+- **"Why does this Agentfile fail strict mode? Here's the YAML: ..."**
+- **"List the bundled examples and show me the simplest one."**
+
+---
+
+## CI / scripting (CLI path)
+
+For pipelines without an agent in the loop, use the CLI directly:
 
 ```bash
 pip install agentfile
+
+# Validate one file or an entire examples directory
 agent validate ./agent.yaml
+agent validate examples          # recurses one level
+
+# Strict mode (warnings become errors — use in CI to catch secret leaks)
+agent validate --strict ./agent.yaml
+
+# Inspect a manifest
+agent show examples/research-agent/agent.yaml
+
+# Dump the JSON Schema
+agent schema --pretty
 ```
 
-That's it. You now have a validated agent manifest you can check into git, share with your team, or publish.
+**GitHub Actions example:**
 
-## Demo
-
-```bash
-$ agent show examples/research-agent/agent.yaml
+```yaml
+- name: Validate Agentfiles
+  run: |
+    pip install agentfile
+    agent validate --strict ./agent.yaml
 ```
 
-```
-╭───────────────── examples/research-agent/agent.yaml ─────────────────╮
-│ research-agent v0.1.0                                                │
-│ A web-research agent that synthesizes findings into briefs.          │
-╰──────────────────────────────────────────────────────────────────────╯
-apiVersion      agentfile/v1
-kind            Agent
-model           anthropic:claude-sonnet-4-5
-params          temperature=0.4, max_tokens=4096
-system_prompt   [file] ./prompts/system.md
-tools (2)       builtin/web_search, builtin/web_fetch
-permissions     network:allowlist, filesystem:read-only
-env (required)  ANTHROPIC_API_KEY
-env (optional)  OTEL_EXPORTER_OTLP_ENDPOINT
-```
-
-```bash
-$ agent validate examples
-✓ examples/research-agent/agent.yaml
-✓ examples/data-pipeline/agent.yaml
-✓ examples/coding-helper/agent.yaml
-
-All 3 Agentfile(s) valid.
-```
-
-Validation catches secret leaks too:
-
-```bash
-$ agent validate leaky-agent.yaml
-✓ (with warnings) leaky-agent.yaml
-  warning: spec.system_prompt: looks like a anthropic-api-key (matched pattern).
-           Credentials must be passed via env vars, not embedded.
-```
-
-## Why this exists
-
-Three things changed in the last year:
-
-1. **MCP stabilized.** Tools can now be addressed by URL across runtimes.
-2. **System prompts got long enough to be code.** Treating them as version-controlled artifacts is now obviously correct.
-3. **Enterprise teams hit the wall.** Once you have 30 agents in production, "how do we share these reliably" stops being a hobby question.
-
-The agent ecosystem has standardized parts — model APIs, tool protocols, frameworks. What's missing is a layer *above* the framework: a portable description of what an agent **is**, independent of how you run it.
-
-That layer is what Dockerfile is for apps. That's what Agentfile is trying to be for agents.
-
-→ Read the [longer motivation](./MOTIVATION.md) for the full argument.
+---
 
 ## How it compares
 
@@ -122,107 +152,68 @@ That layer is what Dockerfile is for apps. That's what Agentfile is trying to be
 | Standardized tool layer | ✅ MCP | ✅ Actions | ❌ Framework-specific | ❌ Framework-specific |
 | Model-agnostic | ✅ | ❌ | ✅ | ✅ |
 | Secret-free by design | ✅ | n/a | ❌ | ❌ |
-| Has a registry | 🔜 v0.4 | ✅ | ❌ | ❌ |
+| MCP-native access | ✅ | ❌ | ❌ | ❌ |
+| Has a registry | 🔜 v0.5 | ✅ | ❌ | ❌ |
 
-## What's in v0.1
-
-- ✅ The **spec** ([`SPEC.md`](./SPEC.md)) — precise, versioned format definition
-- ✅ A **JSON Schema** for machine validation
-- ✅ **Python validator + CLI** — `agent validate`, `agent show`, `agent schema`
-- ✅ **Heuristic secret detection** — catches leaked API keys before they hit Git
-- ✅ **File reference resolution** — system prompts and memory configs as separate files
-- ✅ Three working **examples** demonstrating real patterns
-- ✅ 37 tests, ruff-clean, CI on Python 3.10/3.11/3.12
+---
 
 ## Roadmap
 
-| Version | What | Why |
+| Version | What | Status |
 |---|---|---|
-| **v0.1** ✅ | Spec + validator + CLI | Lock the format. Make it usable. |
-| **v0.2** | Reference Python runner (`agent run`) | Battle-test the spec end-to-end. |
-| **v0.3** | TypeScript validator + runner | Ecosystem reach. |
-| **v0.4** | `agent pack` / `agent publish` | Packaging primitives for sharing. |
-| **v1.0** | Stable spec, registry protocol, signing | Production-grade. |
+| **v0.1** | Spec + validator + CLI | ✅ shipped |
+| **v0.2** | MCP server + Claude skill + agentic README | ✅ this release |
+| **v0.3** | Reference runner as MCP `run_agentfile` tool | planned |
+| **v0.4** | TypeScript port (validator + MCP server) | planned |
+| **v0.5** | `pack` / `publish` / `install` + registry | planned |
+| **v1.0** | Signing, stability, ecosystem | planned |
+
+---
 
 ## Install from source
 
 ```bash
 git clone https://github.com/SumanthVarma798/agentfile.git
 cd agentfile
-pip install -e ".[dev]"
+pip install -e ".[dev,mcp]"
 pytest
+agent validate examples
 ```
 
-## Writing your first Agentfile
-
-```yaml
-apiVersion: agentfile/v1
-kind: Agent
-metadata:
-  name: my-first-agent
-  version: 0.1.0
-spec:
-  model:
-    provider: anthropic
-    name: claude-sonnet-4-5
-  system_prompt: |
-    You are a precise coding assistant.
-    Be concise, never invent APIs.
-  tools:
-    - mcp: builtin/filesystem
-  env:
-    required: [ANTHROPIC_API_KEY]
-```
-
-Save it as `agent.yaml`, then:
-
-```bash
-agent validate agent.yaml
-# ✓ agent.yaml
-```
-
-You're shipping a versioned, reviewable agent.
+---
 
 ## FAQ
+
+**Q: Why MCP-first?**
+MCP is now the standard protocol for agent tool access — every major agent IDE and runtime supports it. Shipping an MCP server means zero integration work: connect once, use everywhere. The CLI is still there for scripts and CI; it just isn't the primary UX anymore.
+
+**Q: Do I still need the CLI?**
+For CI pipelines, Git hooks, and scripts — yes. For authoring and day-to-day use inside an agent environment — no. The MCP server does everything the CLI does and more.
+
+**Q: Is the skill Claude-only?**
+The `skills/agentfile/SKILL.md` file follows a convention Claude Code understands. The underlying MCP server is protocol-standard and works with any MCP-capable client (Cursor, Continue, Cline, etc.). A skill file for other clients can be added in v0.3.
 
 **Q: Is this a framework?**
 No. It's *config* — a manifest format. Use LangGraph, CrewAI, or the raw Anthropic SDK as your runtime.
 
 **Q: Why not just use Docker?**
-Docker captures the *environment*. Agentfile captures the *agent definition*. They compose: a Docker image can ship a runtime that consumes Agentfiles.
+Docker captures the *environment*. Agentfile captures the *agent definition*. They compose.
 
 **Q: How is this different from MCP?**
-MCP is the protocol for *tools*. Agentfile is the manifest for an *agent* that uses MCP tools. Different layers.
-
-**Q: Can the same Agentfile run on different model providers?**
-The format supports it (`provider: anthropic | openai | google | ...`), but behavior won't be identical across providers. The format is portable; semantics aren't fully portable yet — that's an open problem the whole field shares.
-
-**Q: Why "advisory" permissions in v1?**
-Because runtime enforcement is a separate hard problem. v1 establishes the *vocabulary*; v2 will define enforcement semantics. We didn't want to ship a half-enforced security model that gives false confidence.
+MCP is the protocol for *tools*. Agentfile is the manifest for an *agent* that uses MCP tools.
 
 **Q: Is the spec stable?**
-v1 is a *draft*. Within v1, only backwards-compatible additions happen. Breaking changes go to v2.
+`agentfile/v1` is a *draft*. Backwards-compatible additions are allowed; breaking changes bump to v2.
 
-## Goals & non-goals
-
-**Goals**
-- Portability — same Agentfile, any compliant runtime
-- Reviewability — prompts and configs diffable in PRs
-- Composability — tools and memory declared, not hardcoded
-- Secret-free — credentials referenced via env, never embedded
-
-**Non-goals**
-- Replacing agent frameworks
-- Bundling model weights
-- Solving observability, evals, or deployment
+---
 
 ## Contributing
 
-This is a community project. Code changes via PRs; spec changes via [RFCs](./CONTRIBUTING.md#rfc-process).
+Code changes via PRs; spec changes via [RFCs](./CONTRIBUTING.md#rfc-process).
 
-The most valuable thing you can do right now: **try it on a real agent you're building** and tell me where the spec falls short. Open a [Discussion](https://github.com/SumanthVarma798/agentfile/discussions) — that feedback shapes v0.2.
+The most valuable thing right now: **try it on a real agent** and open a [Discussion](https://github.com/SumanthVarma798/agentfile/discussions) when the spec falls short.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup.
+---
 
 ## License
 

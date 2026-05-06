@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agentfile"
-version = "0.1.0"
+version = "0.2.0"
 description = "A portable, declarative format for sharing AI agent setups."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -39,6 +39,7 @@ dev = [
     "types-PyYAML",
     "types-jsonschema",
 ]
+mcp = ["mcp>=1.0"]
 
 [project.urls]
 Homepage = "https://github.com/SumanthVarma798/agentfile"
@@ -47,9 +48,10 @@ Issues = "https://github.com/SumanthVarma798/agentfile/issues"
 
 [project.scripts]
 agent = "agentfile.cli:main"
+agentfile-mcp = "agentfile_mcp.server:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/agentfile"]
+packages = ["src/agentfile", "src/agentfile_mcp"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "schema/agentfile.v1.schema.json" = "agentfile/_schema/agentfile.v1.schema.json"

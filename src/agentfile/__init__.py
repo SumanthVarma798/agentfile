@@ -11,7 +11,7 @@ from agentfile.errors import (
 from agentfile.loader import load_agentfile
 from agentfile.validator import ValidationResult, validate, validate_file
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "AgentfileError",
     "AgentfileReferenceError",
