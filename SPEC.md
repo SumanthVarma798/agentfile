@@ -225,12 +225,16 @@ This mode is appropriate for CI/CD pipelines, Git hooks, and any workflow where 
 The `agentfile-mcp` package wraps the same library functions as an MCP server, making Agentfile tools available natively inside any MCP-capable agent environment (Claude Code, Claude Desktop, Cursor, Continue, Cline, etc.).
 
 The server exposes:
-- **Tools:** `validate_agentfile`, `show_agentfile`, `get_agentfile_schema`, `list_examples`, `read_example`, `scaffold`, `lint_inline`
+- **Tools:** `validate_agentfile`, `review_agentfile`, `compare_agentfiles`, `show_agentfile`, `get_agentfile_schema`, `list_examples`, `read_example`, `scaffold`, `lint_inline`
 - **Resources:** `agentfile://spec`, `agentfile://schema`, `agentfile://examples/{name}`
 
 MCP servers are first-class consumers of the spec. The validation logic is shared: `agentfile-mcp` calls `validate()` / `validate_file()` directly and never duplicates validation rules. Any future change to the validation spec is automatically reflected in both modes.
 
 Connect via: `uvx agentfile-mcp` (stdio transport).
+
+`review_agentfile` layers shareability checks on top of validation. It flags portability risks such as local/private MCP endpoints, bearer-token env vars missing from `spec.env.required`, non-portable filesystem paths, and reviewability notes.
+
+`compare_agentfiles` produces a PR-friendly change summary for two manifests. It highlights model, prompt, tool, permission, memory, env, and metadata changes while summarizing inline prompt content by hash and redacting secret-like values.
 
 ---
 

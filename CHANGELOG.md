@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+### Added
+- `review_agentfile` MCP tool and `agentfile.review.review_file()` helper for team-shareability checks, including local/private endpoint warnings, env contract gaps, and non-portable filesystem paths.
+- `compare_agentfiles` MCP tool and `agentfile.review.compare_files()` helper for PR-friendly Agentfile change summaries with prompt hashing and secret-like value redaction.
+
+### Changed
+- Generalized the `data-pipeline` example so it is vendor- and domain-neutral.
+
 ## [0.2.0] - 2026-05-05
 
 ### Changed (philosophy)
