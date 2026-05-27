@@ -11,10 +11,12 @@ import pytest
 import yaml
 
 from agentfile_mcp.server import (
+    compare_agentfiles,
     get_agentfile_schema,
     lint_inline,
     list_examples,
     read_example,
+    review_agentfile,
     scaffold,
     show_agentfile,
     validate_agentfile,
@@ -248,3 +250,40 @@ spec:
 
         strict = lint_inline(yaml_text, strict=True)
         assert strict["valid"] is False
+
+
+# ---------------------------------------------------------------------------
+# review_agentfile / compare_agentfiles
+# ---------------------------------------------------------------------------
+
+
+class TestReviewAndCompareTools:
+    def test_review_agentfile_returns_shareability_result(self) -> None:
+        path = str(FIXTURES / "valid_minimal.yaml")
+        result = review_agentfile(path)
+        assert {"shareable", "valid", "issue_counts", "issues", "summary"}.issubset(result)
+        assert result["valid"] is True
+
+    def test_compare_agentfiles_returns_changes(self, tmp_path: Path) -> None:
+        base = tmp_path / "base.yaml"
+        head = tmp_path / "head.yaml"
+        base.write_text((FIXTURES / "valid_minimal.yaml").read_text(encoding="utf-8"))
+        head.write_text(
+            """\
+apiVersion: agentfile/v1
+kind: Agent
+metadata:
+  name: test-minimal
+  version: 0.2.0
+spec:
+  model:
+    provider: anthropic
+    name: claude-sonnet-4-5
+  system_prompt: You are helpful.
+""",
+            encoding="utf-8",
+        )
+
+        result = compare_agentfiles(str(base), str(head))
+        assert result["changed"] is True
+        assert any(change["path"] == "metadata.version" for change in result["changes"])

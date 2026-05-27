@@ -14,6 +14,7 @@ from typing import Any
 import yaml
 from mcp.server.fastmcp import FastMCP
 
+from agentfile.review import compare_files, review_file
 from agentfile.validator import get_schema, validate, validate_file
 
 mcp = FastMCP("agentfile")
@@ -34,7 +35,7 @@ _EXAMPLE_META: list[dict[str, str]] = [
     {
         "name": "data-pipeline",
         "path": str(_EXAMPLES_DIR / "data-pipeline" / "agent.yaml"),
-        "description": "FHIR bulk-data pipeline agent with custom MCP servers and Chroma memory.",
+        "description": "Batch data pipeline agent with custom MCP servers and Chroma memory.",
     },
     {
         "name": "coding-helper",
@@ -260,6 +261,41 @@ def lint_inline(yaml_text: str, strict: bool = False) -> dict[str, Any]:
         "errors": result.errors,
         "warnings": result.warnings,
     }
+
+
+@mcp.tool()
+def review_agentfile(path: str, strict: bool = False) -> dict[str, Any]:
+    """Review an Agentfile for team-shareability and portability concerns.
+
+    This runs normal validation plus extra checks for local/private tool endpoints,
+    incomplete env contracts, non-portable filesystem paths, and reviewability notes.
+
+    Args:
+        path: Absolute or relative path to an agent.yaml / Agentfile.yaml.
+        strict: If True, validator warnings are promoted to validation errors.
+
+    Returns:
+        dict with keys: shareable, valid, issue_counts, issues, summary.
+    """
+    return review_file(path, strict=strict)
+
+
+@mcp.tool()
+def compare_agentfiles(base_path: str, head_path: str) -> dict[str, Any]:
+    """Compare two Agentfiles for PR/review summaries.
+
+    The comparison highlights model, prompt, tool, permission, memory, env, and
+    metadata changes. Inline prompt content and secret-like values are summarized
+    or redacted instead of echoed back.
+
+    Args:
+        base_path: Path to the older/base Agentfile.
+        head_path: Path to the newer/head Agentfile.
+
+    Returns:
+        dict with keys: changed, change_count, changes, summary, base_valid, head_valid.
+    """
+    return compare_files(base_path, head_path)
 
 
 # ---------------------------------------------------------------------------

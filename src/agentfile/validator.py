@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass, field
 from importlib import resources
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError as JsonSchemaError
@@ -71,7 +71,7 @@ def _load_schema() -> dict[str, Any]:
         # Repo layout: schema lives in <repo>/schema/
         repo_schema = Path(__file__).resolve().parents[2] / "schema" / "agentfile.v1.schema.json"
         schema_text = repo_schema.read_text(encoding="utf-8")
-    return json.loads(schema_text)
+    return cast(dict[str, Any], json.loads(schema_text))
 
 
 _SCHEMA: dict[str, Any] | None = None
@@ -82,7 +82,7 @@ def get_schema() -> dict[str, Any]:
     global _SCHEMA
     if _SCHEMA is None:
         _SCHEMA = _load_schema()
-    return _SCHEMA
+    return dict(_SCHEMA)
 
 
 def _format_jsonschema_error(err: JsonSchemaError) -> str:

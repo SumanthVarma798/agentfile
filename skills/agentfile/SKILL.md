@@ -33,6 +33,8 @@ Fetch `agentfile://spec` for the authoritative reference when uncertain.
 | Scaffold / create | `scaffold()` |
 | Validate inline YAML | `lint_inline()` |
 | Validate file on disk | `validate_agentfile()` |
+| Review before sharing | `review_agentfile()` |
+| Summarize changes | `compare_agentfiles()` |
 | Inspect a file | `show_agentfile()` |
 | Read bundled example | `read_example()` |
 | Fetch schema | `get_agentfile_schema()` |
@@ -80,8 +82,8 @@ User: (pastes YAML missing spec.model)
 ```
 User: What does the data-pipeline example do?
 → show_agentfile(path="examples/data-pipeline/agent.yaml")
-→ Summarise: "The fhir-pipeline-agent monitors a FHIR bulk-data pipeline using
-   two custom MCP servers (FHIR + OCI Streaming) and Chroma memory for run history."
+→ Summarise: "The batch-pipeline-agent monitors batch pipeline runs using
+   two custom MCP servers (metrics + event streams) and Chroma memory for run history."
 ```
 
 ## Common pitfalls

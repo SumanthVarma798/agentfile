@@ -75,7 +75,7 @@ claude mcp add agentfile -- uvx agentfile-mcp
 claude mcp add agentfile -- pipx run agentfile-mcp
 ```
 
-After connecting, Claude sees these tools: `scaffold`, `validate_agentfile`, `lint_inline`, `show_agentfile`, `read_example`, `list_examples`, `get_agentfile_schema`.
+After connecting, Claude sees these tools: `scaffold`, `validate_agentfile`, `review_agentfile`, `compare_agentfiles`, `lint_inline`, `show_agentfile`, `read_example`, `list_examples`, `get_agentfile_schema`.
 
 ### Cursor / Continue / Cline
 
@@ -94,7 +94,7 @@ Add to your MCP client config (e.g. `.cursor/mcp.json`):
 
 ### Bring your own MCP client
 
-`agentfile-mcp` speaks stdio MCP (Model Context Protocol). Any client that supports MCP stdio transport can connect to it. The server exposes 7 tools and 3 resources over the `agentfile://` URI scheme. See [SPEC.md §14](./SPEC.md#14-consumers) for the full consumer protocol.
+`agentfile-mcp` speaks stdio MCP (Model Context Protocol). Any client that supports MCP stdio transport can connect to it. The server exposes 9 tools and 3 resources over the `agentfile://` URI scheme. See [SPEC.md §14](./SPEC.md#14-consumers) for the full consumer protocol.
 
 ---
 
@@ -104,6 +104,8 @@ Once the MCP server is connected, you can talk to your agent naturally:
 
 - **"Author an Agentfile for an agent that monitors our Postgres database and answers questions about query performance."**
 - **"Validate ./agent.yaml and explain any failures in plain English."**
+- **"Review ./agent.yaml for team-shareability issues before I open a PR."**
+- **"Compare ./agent.old.yaml against ./agent.yaml and summarize what changed."**
 - **"What does the `data-pipeline` example demonstrate? Walk me through it."**
 - **"Convert this LangChain config into an Agentfile — here's the code: ..."**
 - **"Why does this Agentfile fail strict mode? Here's the YAML: ..."**

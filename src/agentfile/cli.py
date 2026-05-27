@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import click
 import yaml
@@ -109,7 +110,7 @@ def show(path: Path, fmt: str) -> None:
     _print_summary(manifest, path)
 
 
-def _print_summary(manifest: dict, path: Path) -> None:
+def _print_summary(manifest: dict[str, Any], path: Path) -> None:
     """Print a friendly tabular summary of an Agentfile."""
     meta = manifest.get("metadata", {})
     spec = manifest.get("spec", {})

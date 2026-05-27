@@ -1,12 +1,12 @@
 apiVersion: agentfile/v1
 kind: Agent
 metadata:
-  name: fhir-pipeline-agent
+  name: batch-pipeline-agent
   version: 0.2.0
-  description: Operates a FHIR bulk data pipeline and answers questions about its state.
+  description: Operates a batch data pipeline and answers questions about its state.
   authors: [Sumanth Varma]
   license: MIT
-  tags: [healthcare, fhir, data-pipeline]
+  tags: [data-pipeline, operations, observability]
 spec:
   model:
     provider: anthropic
@@ -17,34 +17,34 @@ spec:
   system_prompt:
     file: ./prompts/system.md
   tools:
-    - mcp: https://internal-fhir-mcp.example.com/mcp
+    - mcp: https://pipeline-metrics.example.com/mcp
       auth:
         type: bearer
-        env: FHIR_MCP_TOKEN
-    - mcp: https://oci-streaming-mcp.example.com/mcp
+        env: PIPELINE_METRICS_TOKEN
+    - mcp: https://event-streams.example.com/mcp
       auth:
         type: bearer
-        env: OCI_MCP_TOKEN
+        env: EVENT_STREAMS_TOKEN
     - mcp: builtin/filesystem
   memory:
     type: chroma
     config:
-      collection: fhir-pipeline-runs
+      collection: batch-pipeline-runs
       embedding_model: all-MiniLM-L6-v2
   permissions:
     network:
       mode: allowlist
       hosts:
         - api.anthropic.com
-        - internal-fhir-mcp.example.com
-        - oci-streaming-mcp.example.com
+        - pipeline-metrics.example.com
+        - event-streams.example.com
     filesystem:
       mode: read-only
       paths: [./prompts, ./schemas]
   env:
     required:
       - ANTHROPIC_API_KEY
-      - FHIR_MCP_TOKEN
-      - OCI_MCP_TOKEN
+      - PIPELINE_METRICS_TOKEN
+      - EVENT_STREAMS_TOKEN
     optional:
       - LOG_LEVEL
