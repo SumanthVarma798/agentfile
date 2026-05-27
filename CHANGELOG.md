@@ -10,6 +10,7 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ### Changed
 - Generalized the `data-pipeline` example so it is vendor- and domain-neutral.
+- Reworked the README around the agent/MCP workflow before CLI and package details.
 
 ## [0.2.0] - 2026-05-05
 

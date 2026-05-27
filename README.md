@@ -18,21 +18,68 @@
 
 ---
 
-## Try it in 10 seconds
+## Start with your agent
 
-Connect the MCP server (see [Use it with your agent](#use-it-with-your-agent)), then paste this into Claude Code, Claude Desktop, or Cursor:
+Agentfile is meant to be used from inside the agent environment where you already work. Connect the MCP server once, then ask your agent to author, validate, review, inspect, or compare agent manifests.
+
+### Claude Code / Claude Desktop
+
+```bash
+claude mcp add agentfile -- uvx agentfile-mcp
+```
+
+### Cursor / Continue / Cline
+
+Add this to your MCP client config:
+
+```json
+{
+  "mcpServers": {
+    "agentfile": {
+      "command": "uvx",
+      "args": ["agentfile-mcp"]
+    }
+  }
+}
+```
+
+Then paste:
 
 > **"Scaffold an Agentfile for a research agent that uses web search and writes Markdown briefs. Save it to ./agent.yaml and validate it."**
 
-Your agent will call `scaffold()`, write the file, and call `validate_agentfile()` to confirm it passes — all without touching a terminal.
+Your agent can call `scaffold()`, write the file, then call `validate_agentfile()` without making you leave the conversation.
 
 ---
 
-## What is this?
+## What your agent can do
 
-Sharing an agent today: *"clone this, copy these env vars, edit the hardcoded prompt on line 47, install our internal MCP server, hope it works."*
+| Ask your agent to... | MCP tool |
+|---|---|
+| Create a starter manifest | `scaffold` |
+| Validate a file on disk | `validate_agentfile` |
+| Validate pasted YAML | `lint_inline` |
+| Review whether a manifest is safe to share with a team | `review_agentfile` |
+| Compare two versions for a PR summary | `compare_agentfiles` |
+| Explain an existing manifest | `show_agentfile` |
+| Read bundled examples | `list_examples`, `read_example` |
+| Fetch the spec or schema | `agentfile://spec`, `get_agentfile_schema` |
 
-Sharing an agent with Agentfile:
+Example prompts:
+
+- **"Author an Agentfile for an agent that monitors our Postgres database and answers questions about query performance."**
+- **"Validate ./agent.yaml and explain any failures in plain English."**
+- **"Review ./agent.yaml for team-shareability issues before I open a PR."**
+- **"Compare ./agent.old.yaml against ./agent.yaml and summarize what changed."**
+- **"What does the `data-pipeline` example demonstrate? Walk me through it."**
+- **"Convert this LangChain config into an Agentfile — here's the code: ..."**
+
+---
+
+## Why Agentfile exists
+
+Sharing an agent today often sounds like: *"clone this, copy these env vars, edit the hardcoded prompt, install the right tool server, then hope your local setup matches mine."*
+
+Agentfile gives your agent a portable contract:
 
 ```yaml
 # agent.yaml
@@ -50,72 +97,42 @@ spec:
     file: ./prompts/system.md
   tools:
     - mcp: builtin/web_search
-    - mcp: https://internal-kb.corp/mcp
-      auth: { type: bearer, env: KB_TOKEN }
+    - mcp: https://docs.example.com/mcp
+      auth: { type: bearer, env: DOCS_TOKEN }
   permissions:
-    network: { mode: allowlist, hosts: [api.anthropic.com, internal-kb.corp] }
+    network: { mode: allowlist, hosts: [api.anthropic.com, docs.example.com] }
   env:
-    required: [ANTHROPIC_API_KEY, KB_TOKEN]
+    required: [ANTHROPIC_API_KEY, DOCS_TOKEN]
 ```
 
 One file. Diffable. Reviewable. Secret-free. Runs anywhere a compliant runtime exists.
 
 ---
 
-## Use it with your agent
+## Agent workflow
 
-Agentfile ships an MCP server that exposes authoring and validation tools natively. This is the primary way to use it.
+Agentfile keeps the human review loop simple:
 
-### Claude Code / Claude Desktop
+1. Ask your agent to scaffold or update `agent.yaml`.
+2. Ask it to validate the manifest.
+3. Ask it to run the shareability review.
+4. Commit the manifest, prompts, and referenced config files together.
+5. Use `compare_agentfiles` to summarize meaningful changes in PRs.
+
+The MCP server exposes 9 tools and 3 resources over stdio MCP. See [SPEC.md §14](./SPEC.md#14-consumers) for the full consumer protocol.
+
+---
+
+## Install options
+
+Most users only need the MCP server:
 
 ```bash
-# Install the MCP server and register it (one command):
 claude mcp add agentfile -- uvx agentfile-mcp
-# or with pipx:
 claude mcp add agentfile -- pipx run agentfile-mcp
 ```
 
-After connecting, Claude sees these tools: `scaffold`, `validate_agentfile`, `review_agentfile`, `compare_agentfiles`, `lint_inline`, `show_agentfile`, `read_example`, `list_examples`, `get_agentfile_schema`.
-
-### Cursor / Continue / Cline
-
-Add to your MCP client config (e.g. `.cursor/mcp.json`):
-
-```json
-{
-  "mcpServers": {
-    "agentfile": {
-      "command": "uvx",
-      "args": ["agentfile-mcp"]
-    }
-  }
-}
-```
-
-### Bring your own MCP client
-
-`agentfile-mcp` speaks stdio MCP (Model Context Protocol). Any client that supports MCP stdio transport can connect to it. The server exposes 9 tools and 3 resources over the `agentfile://` URI scheme. See [SPEC.md §14](./SPEC.md#14-consumers) for the full consumer protocol.
-
----
-
-## What to say to your agent
-
-Once the MCP server is connected, you can talk to your agent naturally:
-
-- **"Author an Agentfile for an agent that monitors our Postgres database and answers questions about query performance."**
-- **"Validate ./agent.yaml and explain any failures in plain English."**
-- **"Review ./agent.yaml for team-shareability issues before I open a PR."**
-- **"Compare ./agent.old.yaml against ./agent.yaml and summarize what changed."**
-- **"What does the `data-pipeline` example demonstrate? Walk me through it."**
-- **"Convert this LangChain config into an Agentfile — here's the code: ..."**
-- **"Why does this Agentfile fail strict mode? Here's the YAML: ..."**
-- **"List the bundled examples and show me the simplest one."**
-
----
-
-## CI / scripting (CLI path)
-
-For pipelines without an agent in the loop, use the CLI directly:
+For CI, git hooks, and scripts, use the CLI:
 
 ```bash
 pip install agentfile
